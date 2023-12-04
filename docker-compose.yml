@@ -1,9 +1,5 @@
 version: "3"
 
-networks:
-    laravel:
-        driver: bridge
-
 services:
     nginx:
         container_name: "nginx"
@@ -19,7 +15,7 @@ services:
             - ./src:/var/www/html:delegated
         depends_on:
             - php
-            - redis
+            # - redis
             - mysql
         networks:
             - laravel
@@ -41,7 +37,7 @@ services:
             MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
-            TZ: "Asia/Tehran"
+            TZ: "Europe/Paris"
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
             retries: 3
@@ -79,20 +75,8 @@ services:
             - mysql
         networks:
             - laravel
-
-    redis:
-        container_name: "redis"
-        image: redis:alpine
-        restart: unless-stopped
-        ports:
-            - "${FORWARD_REDIS_PORT:-6379}:6379"
-        healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
-            retries: 3
-            timeout: 5s
-        networks:
-            - laravel
-
+    
+    # Tools        
     composer:
         container_name: "composer"
         build:
@@ -136,3 +120,7 @@ services:
         entrypoint: ["php", "/var/www/html/artisan"]
         networks:
             - laravel
+
+networks:
+    laravel:
+        driver: bridge
